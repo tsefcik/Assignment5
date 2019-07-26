@@ -6,6 +6,7 @@ from project import BreastCancer as bc
 from project import HouseVotes as votes
 from project import NaiveBayes as nb
 from project import FiveFold as ff
+from project import LogisticRegression as lr
 import sys
 
 """
@@ -32,7 +33,15 @@ def run_iris(filename, target_class, class_wanted, iris_names):
 
     nb_perf = [iris_nb1, iris_nb2, iris_nb3, iris_nb4, iris_nb5]
 
-    return nb_perf
+    iris_lr1 = perform_lr(iris1)
+    iris_lr2 = perform_lr(iris2)
+    iris_lr3 = perform_lr(iris3)
+    iris_lr4 = perform_lr(iris4)
+    iris_lr5 = perform_lr(iris5)
+
+    lr_perf = [iris_lr1, iris_lr2, iris_lr3, iris_lr4, iris_lr5]
+
+    return nb_perf, lr_perf
 
 
 # Run Naive Bayes on Iris
@@ -72,7 +81,15 @@ def run_glass(filename, target_class, class_wanted, glass_names):
 
     nb_perf = [glass_nb1, glass_nb2, glass_nb3, glass_nb4, glass_nb5]
 
-    return nb_perf
+    glass_lr1 = perform_lr(glass1)
+    glass_lr2 = perform_lr(glass2)
+    glass_lr3 = perform_lr(glass3)
+    glass_lr4 = perform_lr(glass4)
+    glass_lr5 = perform_lr(glass5)
+
+    lr_perf = [glass_lr1, glass_lr2, glass_lr3, glass_lr4, glass_lr5]
+
+    return nb_perf, lr_perf
 
 
 # Run Naive Bayes on Glass
@@ -111,7 +128,15 @@ def run_spambase(filename, target_class):
 
     nb_perf = [spambase_nb1, spambase_nb2, spambase_nb3, spambase_nb4, spambase_nb5]
 
-    return nb_perf
+    spambase_lr1 = perform_lr(spambase1)
+    spambase_lr2 = perform_lr(spambase2)
+    spambase_lr3 = perform_lr(spambase3)
+    spambase_lr4 = perform_lr(spambase4)
+    spambase_lr5 = perform_lr(spambase5)
+
+    lr_perf = [spambase_lr1, spambase_lr2, spambase_lr3, spambase_lr4, spambase_lr5]
+
+    return nb_perf, lr_perf
 
 
 # Run Naive Bayes on Spambase
@@ -150,7 +175,15 @@ def run_bc(filename, target_class, class_wanted, bc_names):
 
     nb_perf = [bc_nb1, bc_nb2, bc_nb3, bc_nb4, bc_nb5]
 
-    return nb_perf
+    bc_lr1 = perform_lr(bc1)
+    bc_lr2 = perform_lr(bc2)
+    bc_lr3 = perform_lr(bc3)
+    bc_lr4 = perform_lr(bc4)
+    bc_lr5 = perform_lr(bc5)
+
+    lr_perf = [bc_lr1, bc_lr2, bc_lr3, bc_lr4, bc_lr5]
+
+    return nb_perf, lr_perf
 
 
 # Run Naive Bayes on Breast Cancer
@@ -189,7 +222,15 @@ def run_votes(filename, target_class, class_wanted, vote_names):
 
     nb_perf = [votes_nb1, votes_nb2, votes_nb3, votes_nb4, votes_nb5]
 
-    return nb_perf
+    votes_lr1 = perform_lr(votes1)
+    votes_lr2 = perform_lr(votes2)
+    votes_lr3 = perform_lr(votes3)
+    votes_lr4 = perform_lr(votes4)
+    votes_lr5 = perform_lr(votes5)
+
+    lr_perf = [votes_lr1, votes_lr2, votes_lr3, votes_lr4, votes_lr5]
+
+    return nb_perf, lr_perf
 
 
 # Run Naive Bayes on House Votes
@@ -210,6 +251,21 @@ def nb_votes(votes_data, target_class):
     return nb_perf
 
 
+# Run Logistic Regression
+def perform_lr(data):
+    # Split the data set into 2/3 and 1/3
+    data_train = data.sample(frac=.667)
+    data_test = data.drop(data_train.index)
+
+    logistic = lr.LogisticRegression(learning_rate=2)
+    weighted_classifier = logistic.train_lr(data=data_train)
+    accuracy, prediction_list = logistic.test_lr(data=data_test)
+
+    lr_values = [weighted_classifier, accuracy, prediction_list]
+
+    return lr_values
+
+
 # Main driver to run all algorithms on each dataset
 def main():
     # Print all output to file
@@ -220,27 +276,51 @@ def main():
     iris_target_class = "class"
     class_wanted = "Iris-virginica"
     iris_names = ["sepal length", "sepal width", "petal length", "petal width", "class"]
-    iris_nb = run_iris(filename="data/iris.data", target_class=iris_target_class, class_wanted=class_wanted,
-                       iris_names=iris_names)
+    iris_nb, iris_lr = run_iris(filename="data/iris.data", target_class=iris_target_class, class_wanted=class_wanted,
+                                iris_names=iris_names)
     for iris_perf in iris_nb:
         print("Success rate for Iris Naive Bayes: " + str(iris_perf) + "%")
+    print()
+    for classifier, perf, predictions in iris_lr:
+        print("Weighted Classifier for Logistic Regression:")
+        print(classifier)
+        print("Class predictions for Logistic Regression:")
+        print(predictions)
+        print("Success rate for Iris Logistic Regression: " + str(perf) + "%")
+        print()
     print('\n' * 3)
 
     ##### Glass #####
     glass_target_class = "Type of glass"
     class_wanted = 3
     glass_names = ["Id", "RI", "Na", "Mg", "Al", "Si", "K", "Ca", "Ba", "Fe", "Type of glass"]
-    glass_nb = run_glass(filename="data/glass.data", target_class=glass_target_class,
-                         class_wanted=class_wanted, glass_names=glass_names)
+    glass_nb, glass_lr = run_glass(filename="data/glass.data", target_class=glass_target_class,
+                                   class_wanted=class_wanted, glass_names=glass_names)
     for glass_perf in glass_nb:
         print("Success rate for Glass Naive Bayes: " + str(glass_perf) + "%")
+    print()
+    for classifier, perf, predictions in glass_lr:
+        print("Weighted Classifier for Logistic Regression:")
+        print(classifier)
+        print("Class predictions for Logistic Regression:")
+        print(predictions)
+        print("Success rate for Glass Logistic Regression: " + str(perf) + "%")
+        print()
     print('\n' * 3)
 
     ##### Spambase #####
     spambase_target_class = "57"
-    spambase_nb = run_spambase(filename="data/spambase.data", target_class=spambase_target_class)
+    spambase_nb, spambase_lr = run_spambase(filename="data/spambase.data", target_class=spambase_target_class)
     for spambase_perf in spambase_nb:
         print("Success rate for Spambase Naive Bayes: " + str(spambase_perf) + "%")
+    print()
+    for classifier, perf, predictions in spambase_lr:
+        print("Weighted Classifier for Logistic Regression:")
+        print(classifier)
+        print("Class predictions for Logistic Regression:")
+        print(predictions)
+        print("Success rate for Spambase Logistic Regression: " + str(perf) + "%")
+        print()
     print('\n' * 3)
 
     ##### Breast Cancer #####
@@ -249,11 +329,19 @@ def main():
     breast_cancer_names = ["Sample code number", "Clump Thickness", "Uniformity of Cell Size",
                            "Uniformity of Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size",
                            "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses", "Class"]
-    bc_nb = run_bc(filename="data/breast-cancer-wisconsin.data", target_class=bc_target_class,
-                   class_wanted=bc_class_wanted, bc_names=breast_cancer_names)
+    bc_nb, bc_lr = run_bc(filename="data/breast-cancer-wisconsin.data", target_class=bc_target_class,
+                          class_wanted=bc_class_wanted, bc_names=breast_cancer_names)
 
     for nb_perf in bc_nb:
         print("Success rate for Breast Cancer Naive Bayes: " + str(nb_perf) + "%")
+    print()
+    for classifier, perf, predictions in bc_lr:
+        print("Weighted Classifier for Logistic Regression:")
+        print(classifier)
+        print("Class predictions for Logistic Regression:")
+        print(predictions)
+        print("Success rate for Breast Cancer Logistic Regression: " + str(perf) + "%")
+        print()
     print('\n' * 3)
 
     ##### House Votes #####
@@ -262,10 +350,18 @@ def main():
     votes_names = ["class", "handicapped", "water", "adoption", "physician", "el-salvador", "religious",
                    "anti", "aid", "mx", "immigration", "synfuels", "education", "superfund", "crime",
                    "duty-free", "export"]
-    votes_nb = run_votes(filename="data/house-votes-84.data", target_class=votes_target_class,
-                         class_wanted=votes_class_wanted, vote_names=votes_names)
+    votes_nb, votes_lr = run_votes(filename="data/house-votes-84.data", target_class=votes_target_class,
+                                   class_wanted=votes_class_wanted, vote_names=votes_names)
     for nb_perf in votes_nb:
         print("Success rate for House Votes Naive Bayes: " + str(nb_perf) + "%")
+    print()
+    for classifier, perf, predictions in votes_lr:
+        print("Weighted Classifier for Logistic Regression:")
+        print(classifier)
+        print("Class predictions for Logistic Regression:")
+        print(predictions)
+        print("Success rate for House Votes Logistic Regression: " + str(perf) + "%")
+        print()
     print('\n' * 3)
 
 
